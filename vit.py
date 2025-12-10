@@ -5,6 +5,28 @@ import torch
 class ViT(pl.LightningModule):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+class AttentionHead(nn.Module):
+    def __init__(self, hid_size, head_size, dropout, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.hid_size = hid_size
+        self.head_size = head_size
+        self.dropout = nn.Dropout(dropout)
+        self.query = nn.Linear(hid_size, head_size)
+        self.key = nn.Linear(hid_size, head_size)
+        self.value = nn.Linear(hid_size, head_size)
+        
+        
+    def forward(self, x):
+        q = self.query(x)
+        k = self.key(x)
+        v = self.value(x)
+        attn_scores = torch.bmm(q, k.transpose(1, 2)) / torch.sqrt(k.size(-1))
+        attn_probs = torch.softmax(attn_scores, dim=-1)
+        attn_out = torch.bmm(attn_probs, v)
+        attn_out = self.dropout(attn_out)
+        return attn_out, attn_probs
+        
         
 class Embedding(nn.Module):
     def __init__(self, cfg, *args, **kwargs):
@@ -41,4 +63,3 @@ class Patch2Embedding(nn.Module):
         out = self.patch_conv(x)
         out = out.flatten(2).transpose(1,2)
         return out
-    
