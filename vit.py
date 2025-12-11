@@ -5,6 +5,8 @@ import torch
 class ViT(pl.LightningModule):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        
+        
 
 class ClassifierHead(nn.Module):
     def __init__(self, cfg, *args, **kwargs):
@@ -27,7 +29,7 @@ class Encoder(nn.Module):
         
     def forward(self, x):
         out = self.blocks(x)
-        return x
+        return out
 
 class BaseBlock(nn.Module):
     def __init__(self, cfg, *args, **kwargs):
