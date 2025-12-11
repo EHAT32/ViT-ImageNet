@@ -6,6 +6,15 @@ class ViT(pl.LightningModule):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+class Encoder(nn.Module):
+    def __init__(self, cfg, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.block_num = cfg['block_number']
+        self.blocks = nn.Sequential(*[BaseBlock(cfg) for _ in range(self.block_num)])
+        
+    def forward(self, x):
+        out = self.blocks(x)
+        return x
 
 class BaseBlock(nn.Module):
     def __init__(self, cfg, *args, **kwargs):
