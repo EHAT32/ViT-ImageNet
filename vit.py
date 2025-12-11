@@ -6,16 +6,38 @@ class ViT(pl.LightningModule):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-class AttentionHead(nn.Module):
-    def __init__(self, hid_size, head_size, dropout, *args, **kwargs):
+
+class MultiHeadAttention(nn.Module):
+    def __init__(self, cfg, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.hid_size = hid_size
-        self.head_size = head_size
-        self.dropout = nn.Dropout(dropout)
-        self.query = nn.Linear(hid_size, head_size)
-        self.key = nn.Linear(hid_size, head_size)
-        self.value = nn.Linear(hid_size, head_size)
+        self.head_num = cfg['attention_head_number']
+        self.hid_dim = cfg['hidden_dim']
+        assert self.hid_dim % self.head_num == 0
+        head_dim = self.hid_dim // self.head_num
+        self.heads = nn.ModuleList([AttentionHead(self.hid_dim, head_dim, cfg['attention_dropout']) for _ in range(self.head_num)])
+        self.linear = nn.Linear(self.hid_dim, self.hid_dim)
+        self.dropout = nn.Dropout(cfg['multihead_attention_dropout'])
         
+    def forward(self, x):
+        outputs = []
+        for head in self.heads:
+            output = head(x)
+            outputs.append(output)
+        output = torch.cat(outputs, dim=-1)
+        output = self.linear(output)
+        output = self.dropout(output)
+        return output
+        
+
+class AttentionHead(nn.Module):
+    def __init__(self, hid_dim, head_dim, dropout, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.hid_dim = hid_dim
+        self.head_dim = head_dim
+        self.dropout = nn.Dropout(dropout)
+        self.query = nn.Linear(hid_dim, head_dim)
+        self.key = nn.Linear(hid_dim, head_dim)
+        self.value = nn.Linear(hid_dim, head_dim)
         
     def forward(self, x):
         q = self.query(x)
@@ -25,7 +47,7 @@ class AttentionHead(nn.Module):
         attn_probs = torch.softmax(attn_scores, dim=-1)
         attn_out = torch.bmm(attn_probs, v)
         attn_out = self.dropout(attn_out)
-        return attn_out, attn_probs
+        return attn_out
         
         
 class Embedding(nn.Module):
