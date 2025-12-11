@@ -6,6 +6,23 @@ class ViT(pl.LightningModule):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+
+class TransformerBlock(nn.Module):
+    def __init__(self, cfg, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.hid_dim = cfg['hidden_dim']
+        self.norm1 = nn.LayerNorm(self.hid_dim)
+        self.mha = MultiHeadAttention(cfg)
+        self.norm2 = nn.LayerNorm(self.hid_dim)
+        self.ffn = FFN(cfg)
+        
+    def forward(self, x):
+        out = self.norm1(x)
+        out = out + self.mha(out)
+        out = self.norm2(out)
+        out = out + self.ffn(out)
+        return out
+
 class FFN(nn.Module):
     #do not search "mlp in transformer" in google
     def __init__(self, cfg, *args, **kwargs):
