@@ -7,7 +7,7 @@ class ViT(pl.LightningModule):
         super().__init__(*args, **kwargs)
 
 
-class TransformerBlock(nn.Module):
+class BaseBlock(nn.Module):
     def __init__(self, cfg, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.hid_dim = cfg['hidden_dim']
