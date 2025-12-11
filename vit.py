@@ -3,10 +3,18 @@ import torch.nn as nn
 import torch
 
 class ViT(pl.LightningModule):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, cfg, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.embedding_proj = Embedding(cfg)
+        self.encoder = Encoder(cfg)
+        self.classifier = ClassifierHead(cfg)
         
-        
+    def forward(self, x):
+        emb = self.embedding_proj(x)
+        emb = self.encoder(emb)
+        logits, probs = self.classifier(emb)
+        return logits, probs
+
 
 class ClassifierHead(nn.Module):
     def __init__(self, cfg, *args, **kwargs):
