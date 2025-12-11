@@ -114,7 +114,7 @@ class FFN(nn.Module):
         
     def forward(self, x):
         out = self.linear1(x)
-        out = self.activation(x)
+        out = self.activation(out)
         out = self.linear2()
         out = self.dropout(out)
         return out
