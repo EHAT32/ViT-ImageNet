@@ -6,6 +6,24 @@ class ViT(pl.LightningModule):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+class FFN(nn.Module):
+    #do not search "mlp in transformer" in google
+    def __init__(self, cfg, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.hid_dim = cfg['hidden_dim']
+        self.ffn_dim = cfg['ffn_dim']
+        self.linear1 = nn.Linear(self.hid_dim, self.ffn_dim)
+        self.linear2 = nn.Linear(self.ffn_dim, self.hid_dim)
+        self.activation = nn.GELU()
+        self.dropout = nn.Dropout(cfg['ffn_dropout'])
+        
+    def forward(self, x):
+        out = self.linear1(x)
+        out = self.activation(x)
+        out = self.linear2()
+        out = self.dropout(out)
+        return out
+
 
 class MultiHeadAttention(nn.Module):
     def __init__(self, cfg, *args, **kwargs):
