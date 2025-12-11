@@ -6,6 +6,19 @@ class ViT(pl.LightningModule):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+class ClassifierHead(nn.Module):
+    def __init__(self, cfg, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.hid_dim = cfg['hidden_dim']
+        self.class_num = cfg['class_number']
+        self.linear = nn.Linear(self.hid_dim, self.class_num)
+    
+    def forward(self, x):
+        logits = self.linear(x[:, 0]) #cls token
+        probs = torch.softmax(logits, dim=-1)
+        return logits, probs
+
+
 class Encoder(nn.Module):
     def __init__(self, cfg, *args, **kwargs):
         super().__init__(*args, **kwargs)
