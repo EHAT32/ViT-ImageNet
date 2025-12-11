@@ -1,5 +1,6 @@
 import pytorch_lightning as pl
 import torch.nn as nn
+from torchmetrics import Accuracy
 import torch
 
 class ViT(pl.LightningModule):
@@ -9,11 +10,56 @@ class ViT(pl.LightningModule):
         self.encoder = Encoder(cfg)
         self.classifier = ClassifierHead(cfg)
         
+        self.criterion = nn.CrossEntropyLoss()
+        self.train_acc = Accuracy(task='multiclass', num_classes=cfg['class_number'])
+        self.val_acc = Accuracy(task='multiclass', num_classes=cfg['class_number'])
+        self.optimizer_cfg = cfg['optimizer']
+        
+        
     def forward(self, x):
         emb = self.embedding_proj(x)
         emb = self.encoder(emb)
         logits, probs = self.classifier(emb)
         return logits, probs
+    
+    def training_step(self, batch, batch_idx):
+        imgs, labels = batch
+        logits, _ = self(imgs)
+        loss = self.criterion(logits, labels)
+        self.log('train_loss', loss)
+        self.train_acc(logits, labels)
+        self.log('train_acc', self.train_acc, on_epoch=True, prog_bar=True)
+        return loss
+
+    def validation_step(self, batch, batch_idx):
+        imgs, labels = batch
+        logits, _ = self(imgs)
+        loss = self.criterion(logits, labels)
+        self.log('val_loss', loss)
+        self.val_acc(logits, labels)
+        self.log('val_acc', self.val_acc, on_epoch=True, prog_bar=True)
+        
+    def on_train_epoch_end(self):
+        self.train_acc.reset()
+        
+    def configure_optimizers(self):
+        cfg = self.optimizer_cfg
+        optimizer = torch.optim.AdamW(
+            self.parameters(),
+            lr=cfg['lr'],
+            betas = cfg['betas'],
+            weight_decay=cfg['weight_decay']
+        )
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+            optimizer, T_max=self.trainer.max_epochs, eta_min=cfg['eta_min']
+        )
+        return {
+            'optimizer' : optimizer,
+            'lr_scheduler' : {
+                'scheduler' : scheduler, 
+                'interval' : 'epoch'
+            }
+        }
 
 
 class ClassifierHead(nn.Module):
