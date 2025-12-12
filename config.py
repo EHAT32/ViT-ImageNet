@@ -12,7 +12,7 @@ config = {
     
     #dropout probs
     'embedding_dropout' : 0.1,
-    'ffn_dropoput' : 0.1,
+    'ffn_dropout' : 0.1,
     'multihead_attention_dropout' : 0.1,
     'attention_dropout' : 0.1,
     
