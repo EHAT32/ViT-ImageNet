@@ -1,7 +1,8 @@
+from torchmetrics import Accuracy
 import pytorch_lightning as pl
 import torch.nn as nn
-from torchmetrics import Accuracy
 import torch
+import math
 
 class ViT(pl.LightningModule):
     def __init__(self, cfg, *args, **kwargs):
@@ -115,7 +116,7 @@ class FFN(nn.Module):
     def forward(self, x):
         out = self.linear1(x)
         out = self.activation(out)
-        out = self.linear2()
+        out = self.linear2(out)
         out = self.dropout(out)
         return out
 
@@ -156,7 +157,7 @@ class AttentionHead(nn.Module):
         q = self.query(x)
         k = self.key(x)
         v = self.value(x)
-        attn_scores = torch.bmm(q, k.transpose(1, 2)) / torch.sqrt(k.size(-1))
+        attn_scores = torch.bmm(q, k.transpose(1, 2)) / math.sqrt(k.size(-1))
         attn_probs = torch.softmax(attn_scores, dim=-1)
         attn_out = torch.bmm(attn_probs, v)
         attn_out = self.dropout(attn_out)
