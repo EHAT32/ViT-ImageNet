@@ -10,7 +10,7 @@
 Для запуска выполните следующую команду:
 
 ```
-streamlit run streamlit_yolo.py
+streamlit run app.py
 ```
 
 #### Пример работы сайта (при запуске app.py)
