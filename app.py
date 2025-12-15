@@ -5,6 +5,7 @@ from PIL import Image
 from collections import OrderedDict
 from vit import ViT
 from config import config
+import os
 
 st.set_page_config(page_title="ViT Classificator", page_icon="🖼️", layout="wide")
 
@@ -64,14 +65,29 @@ def predict(image, model, labels):
             probabilities = torch.nn.functional.softmax(outputs, dim=1)
             top_prob, top_class = torch.max(probabilities, 1)
 
-        return labels[top_class.item()], top_prob.item()
+        return id2word[labels[top_class.item()]], top_prob.item()
     except Exception as e:
         st.error(f"Ошибка при предсказании: {e}")
         return None, None
 
+def get_tiny_imagenet_classes(root: str):
+    train_root = os.path.join(root, "train")
+    classes = sorted([d for d in os.listdir(train_root)
+                      if os.path.isdir(os.path.join(train_root, d))])
+    return classes
+
+root = "./data/tiny-imagenet-200"
+classes = get_tiny_imagenet_classes(root)
+id2word = {}
+with open('./data/tiny-imagenet-200/words.txt', 'r') as f:
+    lines = f.readlines()
+    lines = [line.strip('\n').split('	') for line in lines]
+    for id, word in lines:
+        id2word[id] = word
 
 # Интерфейс Streamlit
 def main():
+    
     st.title("Классификация изображений с помощью ViT")
     st.write("Загрузите изображение для классификации")
 
@@ -79,6 +95,8 @@ def main():
     with st.spinner("Загрузка модели..."):
         model = load_model()
         labels = load_class_labels()
+
+    labels = classes
 
     # Загрузка изображения
     uploaded_file = st.file_uploader(
@@ -113,7 +131,7 @@ def main():
                             st.write("**Топ-3 предсказания:**")
                             for i in range(3):
                                 st.write(
-                                    f"{i+1}. {labels[top_indices[0][i]]}: {top_probs[0][i]:.2%}"
+                                    f"{i+1}. {id2word[labels[top_indices[0][i]]]}: {top_probs[0][i]:.2%}"
                                 )
 
     with col2:
