@@ -1,7 +1,7 @@
 config = {
     #model size
     'img_size' : 64,
-    'patch_size' : 16,
+    'patch_size' : 8,
     'channel_num' : 3,
     'embedding_dim' : 192,
     'hidden_dim' : 192,
