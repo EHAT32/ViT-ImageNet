@@ -141,10 +141,10 @@ def main():
         st.markdown("**Поддерживаемые форматы:** JPG, PNG, JPEG, BMP")
         st.markdown("**Модель:** ViT")
 
-        # Пример вывода меток классов
+        # Метки классов
         with st.expander("Просмотреть все классы"):
-            for i, label in enumerate(labels):
-                st.write(f"{i}: {label}")
+            for i in range(len(classes)):
+                st.write(f"{i}: {id2word[classes[i]]}")
 
 
 if __name__ == "__main__":
