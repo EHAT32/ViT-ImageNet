@@ -19,4 +19,4 @@ streamlit run app.py
 ```
 
 #### Пример работы сайта (при запуске app.py)
-![Пример]https://github.com/EHAT32/ViT-ImageNet/blob/web-app/animation.gif
+![Пример](https://github.com/EHAT32/ViT-ImageNet/blob/web-app/animation.gif)
