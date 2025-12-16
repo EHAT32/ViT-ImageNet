@@ -71,15 +71,16 @@ def predict(image, model, labels):
         return None, None
 
 def get_tiny_imagenet_classes(root: str):
-    train_root = os.path.join(root, "train")
-    classes = sorted([d for d in os.listdir(train_root)
-                      if os.path.isdir(os.path.join(train_root, d))])
+    labels_file = os.path.join(root, "wnids.txt")
+    with open(labels_file, 'r') as f:
+        classes = sorted([line.strip() for line in f])
+        print((classes))
     return classes
 
-root = "./data/tiny-imagenet-200"
+root = "model"
 classes = get_tiny_imagenet_classes(root)
 id2word = {}
-with open('./data/tiny-imagenet-200/words.txt', 'r') as f:
+with open(f'{root}/words.txt', 'r') as f:
     lines = f.readlines()
     lines = [line.strip('\n').split('	') for line in lines]
     for id, word in lines:

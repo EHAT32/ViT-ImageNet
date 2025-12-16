@@ -10,8 +10,6 @@
 pip install -r requirements.txt
 ```
 
-Также необходимо иметь датасет Tiny ImageNet в папке data рядом с app.py
-
 Для запуска выполните следующую команду:
 
 ```
