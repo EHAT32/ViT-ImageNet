@@ -24,3 +24,8 @@ streamlit run app.py
 
 #### Пример работы сайта (при запуске app.py)
 ![Пример](https://github.com/EHAT32/ViT-ImageNet/blob/main/animation.gif)
+
+
+#### Обучение модели
+
+Процесс обучения смотрите в этом [ноутбуке](https://github.com/EHAT32/ViT-ImageNet/blob/main/ViT-ImageNet.ipynb)
