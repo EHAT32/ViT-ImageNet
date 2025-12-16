@@ -13,7 +13,7 @@ st.set_page_config(page_title="ViT Classificator", page_icon="🖼️", layout="
 # Загрузка модели
 @st.cache_resource
 def load_model():
-    checkpoint = torch.load("model/model.ckpt", map_location=torch.device("cpu"))
+    checkpoint = torch.load("model/model.ckpt", map_location=device)
     state_dict = checkpoint["state_dict"]
 
     new_state_dict = OrderedDict()
@@ -27,7 +27,7 @@ def load_model():
 
     model = ViT(config)
     model.load_state_dict(new_state_dict)
-
+    model.to(device)
     model.eval()
     return model
 
@@ -48,7 +48,7 @@ def preprocess_image(image):
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ]
     )
-    return transform(image).unsqueeze(0)
+    return transform(image).unsqueeze(0).to(device)
 
 
 # Предсказание
@@ -76,7 +76,7 @@ def get_tiny_imagenet_classes(root: str):
         classes = sorted([line.strip() for line in f])
         print((classes))
     return classes
-
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 root = "model"
 classes = get_tiny_imagenet_classes(root)
 id2word = {}
