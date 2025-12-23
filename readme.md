@@ -29,3 +29,5 @@ streamlit run app.py
 #### Обучение модели
 
 Процесс обучения смотрите в этом [ноутбуке](https://github.com/EHAT32/ViT-ImageNet/blob/main/ViT-ImageNet.ipynb)
+
+#### [Презентация](https://docs.google.com/presentation/d/1w9-Skrx8YtiYeWu3tznE63PwjVI6QMein-asRqb0pJk/edit?usp=sharing)
